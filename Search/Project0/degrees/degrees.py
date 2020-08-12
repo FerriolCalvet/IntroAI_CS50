@@ -62,6 +62,9 @@ def main():
     load_data(directory)
     print("Data loaded.")
 
+    # Here we make sure both persons requested are on the list
+    # and we retrieve the ID of those two
+    # this is why we can forget about the name and use only IDs
     source = person_id_for_name(input("Name: "))
     if source is None:
         sys.exit("Person not found.")
@@ -71,6 +74,9 @@ def main():
 
     path = shortest_path(source, target)
 
+
+    # this part of the code is to output the result of the shortest
+    # path found between two people in case there is a path
     if path is None:
         print("Not connected.")
     else:
@@ -84,6 +90,7 @@ def main():
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 
+# This is the function we have to implement
 def shortest_path(source, target):
     """
     Returns the shortest list of (movie_id, person_id) pairs
@@ -92,8 +99,74 @@ def shortest_path(source, target):
     If no possible path, returns None.
     """
 
-    # TODO
+    # TO DO
+
+    # Keep track of number of states explored
+    num_explored = 0
+
+    # Initialize frontier to just the starting position
+    start = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(start)
+
+    # Initialize an empty explored set
+    explored = set()
+
+    # Keep looping until solution found
+    while True:
+
+        # If nothing left in frontier, then no path
+        if frontier.empty():
+            return None
+
+        # Choose a node from the frontier
+        node = frontier.remove()
+        num_explored += 1
+
+        # We are checking this when adding a node to the frontier
+        # so we don't need to check it here
+        # # If node is the goal, then we have a solution
+        # if node.state == target:
+        #     return solution_found(node)
+
+
+        # Mark node as explored
+        explored.add(node.state)
+
+
+        # Compute neighbours of the current node
+        neighbors = neighbors_for_person(node.state)
+
+
+        # Add neighbors to frontier
+        for action, state in neighbors:
+            if not frontier.contains_state(state) and state not in explored:
+                child = Node(state=state, parent=node, action=action)
+                # check if the node we are adding is the goal
+                if state == target:
+                    # if so return the solution
+                    return solution_found(child)
+                # else add the node to the frontier
+                frontier.add(child)
+
+
+
     raise NotImplementedError
+
+
+def solution_found(node):
+    """
+    This function is called once the goal
+    is reached, and it produces the shortest path
+    from the source to the target
+    """
+    solution = []
+    while node.parent is not None:
+        solution.append((node.action, node.state))
+        node = node.parent
+    solution.reverse()
+    return solution
+
 
 
 def person_id_for_name(name):

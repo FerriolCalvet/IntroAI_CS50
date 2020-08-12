@@ -1,8 +1,9 @@
 class Node():
+    # in this case, each node is a person
     def __init__(self, state, parent, action):
-        self.state = state
-        self.parent = parent
-        self.action = action
+        self.state = state # person id
+        self.parent = parent # person id of the previous person in the path
+        self.action = action # movie that joins the current and parent persons
 
 
 class StackFrontier():
